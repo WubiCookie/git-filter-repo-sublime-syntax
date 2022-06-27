@@ -2,8 +2,6 @@
 ---
 name: Git filter-repo
 version: 2
-file_extensions:
-  - txt
 hidden_file_extensions:
   - blob-shas-and-paths.txt
   - directories-all-sizes.txt
