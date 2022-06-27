@@ -1,1 +1,0 @@
-{"version": "1.0.0", "description": "A git filter-repo --analyze output syntax plugin", "url": "https://github.com/WubiCookie/git-filter-repo-sublime-syntax", "platforms": ["*"], "dependencies": [], "sublime_text": "*"}
