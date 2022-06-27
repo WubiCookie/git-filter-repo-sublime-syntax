@@ -1,0 +1,182 @@
+%YAML 1.2
+---
+name: Git filter-repo
+version: 2
+file_extensions:
+  - txt
+hidden_file_extensions:
+  - blob-shas-and-paths.txt
+  - directories-all-sizes.txt
+  - directories-deleted-sizes.txt
+  - extensions-all-sizes.txt
+  - extensions-deleted-sizes.txt
+  - path-all-sizes.txt
+  - path-deleted-sizes.txt
+first_line_match: ^===(.*)===$
+scope: text.plain
+
+contexts:
+  main:
+    - match: ^===(.*)===$
+      scope: comment
+      set:
+      - match: ^Format:.*$
+        scope: comment
+        pop: true
+    - match: .*
+      push: line
+
+  line:
+    - match: ^\s+
+      branch_point: line_branch
+      branch:
+        - sha
+        - unpackedsize
+
+
+
+  sha:
+    - match: \h{40}
+      scope: git.filter-repo.sha string
+      push: unpackedsize_sha
+    - match: \d+\b
+      fail: line_branch
+
+  unpackedsize_sha:
+    - match: (\d{1,3})\b
+      captures:
+        1: git.filter-repo.unpackedsize entity.name
+      push: packedsize_sha
+      pop: true
+    - match: (\d{1,3})(\d{3})\b
+      captures:
+        1: git.filter-repo.unpackedsize variable.function
+        2: git.filter-repo.unpackedsize entity.name
+      push: packedsize_sha
+      pop: true
+    - match: (\d{1,3})(\d{3})(\d{3})\b
+      captures:
+        1: git.filter-repo.unpackedsize constant.numeric
+        2: git.filter-repo.unpackedsize variable.function
+        3: git.filter-repo.unpackedsize entity.name
+      push: packedsize_sha
+      pop: true
+    - match: (\d{1,3})(\d{3})(\d{3})(\d{3})\b
+      captures:
+        1: git.filter-repo.unpackedsize keyword
+        2: git.filter-repo.unpackedsize constant.numeric
+        3: git.filter-repo.unpackedsize variable.function
+        4: git.filter-repo.unpackedsize entity.name
+      push: packedsize_sha
+      pop: true
+
+  packedsize_sha:
+    - match: (\d{1,3})\b
+      captures:
+        1: git.filter-repo.packedsize entity.name
+      push: value
+      pop: true
+    - match: (\d{1,3})(\d{3})\b
+      captures:
+        1: git.filter-repo.packedsize variable.function
+        2: git.filter-repo.packedsize entity.name
+      push: value
+      pop: true
+    - match: (\d{1,3})(\d{3})(\d{3})\b
+      captures:
+        1: git.filter-repo.packedsize constant.numeric
+        2: git.filter-repo.packedsize variable.function
+        3: git.filter-repo.packedsize entity.name
+      push: value
+      pop: true
+    - match: (\d{1,3})(\d{3})(\d{3})(\d{3})\b
+      captures:
+        1: git.filter-repo.packedsize keyword
+        2: git.filter-repo.packedsize constant.numeric
+        3: git.filter-repo.packedsize variable.function
+        4: git.filter-repo.packedsize entity.name
+      push: value
+      pop: true
+
+
+
+  unpackedsize:
+    - match: (\d{1,3})\b
+      captures:
+        1: git.filter-repo.unpackedsize entity.name
+      push: packedsize
+      pop: true
+    - match: (\d{1,3})(\d{3})\b
+      captures:
+        1: git.filter-repo.unpackedsize variable.function
+        2: git.filter-repo.unpackedsize entity.name
+      push: packedsize
+      pop: true
+    - match: (\d{1,3})(\d{3})(\d{3})\b
+      captures:
+        1: git.filter-repo.unpackedsize constant.numeric
+        2: git.filter-repo.unpackedsize variable.function
+        3: git.filter-repo.unpackedsize entity.name
+      push: packedsize
+      pop: true
+    - match: (\d{1,3})(\d{3})(\d{3})(\d{3})\b
+      captures:
+        1: git.filter-repo.unpackedsize keyword
+        2: git.filter-repo.unpackedsize constant.numeric
+        3: git.filter-repo.unpackedsize variable.function
+        4: git.filter-repo.unpackedsize entity.name
+      push: packedsize
+      pop: true
+
+  packedsize:
+    - match: (\d{1,3})\b
+      captures:
+        1: git.filter-repo.packedsize entity.name
+      push: deletiondate
+      pop: true
+    - match: (\d{1,3})(\d{3})\b
+      captures:
+        1: git.filter-repo.packedsize variable.function
+        2: git.filter-repo.packedsize entity.name
+      push: deletiondate
+      pop: true
+    - match: (\d{1,3})(\d{3})(\d{3})\b
+      captures:
+        1: git.filter-repo.packedsize constant.numeric
+        2: git.filter-repo.packedsize variable.function
+        3: git.filter-repo.packedsize entity.name
+      push: deletiondate
+      pop: true
+    - match: (\d{1,3})(\d{3})(\d{3})(\d{3})\b
+      captures:
+        1: git.filter-repo.packedsize keyword
+        2: git.filter-repo.packedsize constant.numeric
+        3: git.filter-repo.packedsize variable.function
+        4: git.filter-repo.packedsize entity.name
+      push: deletiondate
+      pop: true
+
+
+
+
+    # - match: \b\d+\b
+    #   scope: git.filter-repo.packedsize constant.numeric
+    #   push: deletiondate
+    #   pop: true
+
+  deletiondate:
+    - match: \d{4}-\d\d-\d\d
+      scope: git.filter-repo.deletiondate string
+      push: value
+      pop: true
+    - match: <present>
+      scope: git.filter-repo.deletiondate.present keyword
+      push: value
+      pop: true
+
+
+
+  value:
+    - match: (.*)$
+      scope: git.filter-repo.value
+      pop: true
